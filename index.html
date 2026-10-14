@@ -1,0 +1,3531 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智慧課堂多元點名系統</title>
+  <script>
+    (function () {
+      var theme = localStorage.getItem('agy_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+    })();
+  </script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --orange: #f97316;
+      --orange-light: #fff7ed;
+      --info: #6366f1;
+      --info-light: #eef2ff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "Noto Sans TC", sans-serif;
+      color-scheme: light;
+    }
+
+    [data-theme="dark"] {
+      --primary: #60a5fa;
+      --primary-hover: #93c5fd;
+      --primary-light: #1e3a8a;
+      --success: #34d399;
+      --success-light: #064e3b;
+      --warning: #fbbf24;
+      --warning-light: #78350f;
+      --danger: #f87171;
+      --danger-light: #7f1d1d;
+      --orange: #fb923c;
+      --orange-light: #7c2d12;
+      --info: #818cf8;
+      --info-light: #312e81;
+      --gray-50: #0b1220;
+      --gray-100: #1e293b;
+      --gray-200: #334155;
+      --gray-300: #475569;
+      --gray-400: #94a3b8;
+      --gray-500: #94a3b8;
+      --gray-600: #cbd5e1;
+      --gray-700: #e2e8f0;
+      --gray-800: #f1f5f9;
+      --gray-900: #f8fafc;
+      --bg: #020617;
+      --surface: #0f172a;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.55), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--gray-800);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation */
+    header {
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), #1e40af);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.3rem;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+    }
+
+    .logo-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      letter-spacing: -0.01em;
+    }
+
+    .logo-text p {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .nav-tabs {
+      display: flex;
+      background-color: var(--gray-100);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      gap: 2px;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--gray-900);
+    }
+
+    .tab-btn.active {
+      background-color: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Common Card */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Session Settings Bar */
+    .session-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      background: var(--surface);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow);
+      margin-bottom: 1.25rem;
+      align-items: end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .form-control {
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      color: var(--gray-800);
+      background-color: var(--surface);
+      transition: border-color 0.15s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--gray-100);
+      color: var(--gray-700);
+      border-color: var(--gray-300);
+    }
+    .btn-secondary:hover {
+      background-color: var(--gray-200);
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+    .btn-success:hover {
+      background-color: #059669;
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.775rem;
+    }
+
+    /* Mode Selection Tabs */
+    .mode-selector {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .mode-card {
+      background: var(--surface);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      transition: all 0.2s ease;
+      user-select: none;
+      position: relative;
+    }
+
+    .mode-card:hover {
+      border-color: var(--gray-300);
+      transform: translateY(-1px);
+    }
+
+    .mode-card.active {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    .mode-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      background: var(--gray-100);
+      color: var(--gray-600);
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .mode-card.active .mode-icon {
+      background: var(--primary);
+      color: white;
+    }
+
+    .mode-info h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .mode-info p {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .badge-highlight {
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 1px 6px;
+      border-radius: 999px;
+    }
+
+    /* Multi-modal Interactive Panels */
+    .mode-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .mode-panel.active {
+      display: block;
+    }
+
+    /* Countdown Bar in Modes */
+    .countdown-setup-box {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .timer-presets {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .timer-btn {
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--gray-300);
+      background: var(--surface);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .timer-btn:hover, .timer-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Live Countdown Display */
+    .countdown-active-banner {
+      display: none;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: white;
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .countdown-active-banner.active {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      animation: pulseBanner 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseBanner {
+      0%, 100% { box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
+      50% { box-shadow: 0 4px 25px rgba(37, 99, 235, 0.7); }
+    }
+
+    .timer-digit {
+      font-size: 2.25rem;
+      font-family: monospace;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .timer-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 999px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+
+    .timer-progress-fill {
+      height: 100%;
+      background: #10b981;
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    /* QR Code Display & Simulation */
+    .qr-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 0;
+    }
+
+    .qr-box {
+      background: var(--surface);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      border: 1px solid var(--gray-200);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      min-width: 220px;
+    }
+
+    #qrcode {
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 180px;
+      min-height: 180px;
+    }
+
+    #qrcode svg {
+      width: 170px;
+      height: 170px;
+      display: block;
+    }
+
+    .qr-meta {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+      text-align: center;
+    }
+
+    .simulation-box {
+      flex: 1;
+      min-width: 280px;
+      max-width: 500px;
+      background: var(--gray-50);
+      border: 1px dashed var(--gray-300);
+      border-radius: var(--radius);
+      padding: 1.15rem;
+    }
+
+    .simulation-box h5 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* GPS Sign-in Container */
+    .gps-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 0.5rem 0;
+    }
+
+    .gps-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+
+    /* Random Picker Box */
+    .random-picker-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .random-display-card {
+      min-width: 280px;
+      background: linear-gradient(135deg, #f8fafc, #edf2f7);
+      border: 2px dashed var(--primary);
+      border-radius: var(--radius);
+      padding: 2rem 3rem;
+      margin: 1.5rem 0;
+      transition: all 0.3s;
+    }
+
+    .random-student-name {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 0.25rem;
+    }
+
+    .random-student-id {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    .random-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Roll Call Interactive Area */
+    .rollcall-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .status-summary-chips {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.775rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .chip-present { background: var(--success-light); color: var(--success); }
+    .chip-late { background: var(--warning-light); color: var(--warning); }
+    .chip-absent { background: var(--danger-light); color: var(--danger); }
+    .chip-early { background: var(--orange-light); color: var(--orange); }
+    .chip-leave { background: var(--info-light); color: var(--info); }
+
+    /* Student Attendance Table / List */
+    .student-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .student-row {
+      background: var(--surface);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: all 0.15s ease;
+    }
+
+    .student-row:hover {
+      border-color: var(--gray-300);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .student-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 180px;
+    }
+
+    .student-seq {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gray-400);
+      width: 24px;
+    }
+
+    .student-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .student-id {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+    }
+
+    /* 5 Status Buttons Switcher */
+    .status-btn-group {
+      display: flex;
+      gap: 0.35rem;
+      background: var(--gray-100);
+      padding: 3px;
+      border-radius: 8px;
+    }
+
+    .status-toggle {
+      border: none;
+      background: transparent;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all 0.12s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .status-toggle:hover {
+      color: var(--gray-900);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .status-toggle.present.active {
+      background: var(--success);
+      color: white;
+      box-shadow: 0 1px 3px rgba(16, 185, 129, 0.4);
+    }
+    .status-toggle.late.active {
+      background: var(--warning);
+      color: white;
+      box-shadow: 0 1px 3px rgba(245, 158, 11, 0.4);
+    }
+    .status-toggle.absent.active {
+      background: var(--danger);
+      color: white;
+      box-shadow: 0 1px 3px rgba(239, 68, 68, 0.4);
+    }
+    .status-toggle.early.active {
+      background: var(--orange);
+      color: white;
+      box-shadow: 0 1px 3px rgba(249, 115, 22, 0.4);
+    }
+    .status-toggle.leave.active {
+      background: var(--info);
+      color: white;
+      box-shadow: 0 1px 3px rgba(99, 102, 241, 0.4);
+    }
+
+    .student-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .note-input {
+      padding: 0.3rem 0.5rem;
+      font-size: 0.775rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      width: 120px;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Statistics & Grades Styling */
+    .stats-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--gray-900);
+    }
+
+    .stat-desc {
+      font-size: 0.75rem;
+      color: var(--gray-400);
+    }
+
+    /* Tables */
+    .data-table-container {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    .data-table th {
+      background-color: var(--gray-50);
+      color: var(--gray-600);
+      font-weight: 700;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--gray-200);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--gray-100);
+      color: var(--gray-800);
+      white-space: nowrap;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background-color: var(--gray-50);
+    }
+
+    .grade-badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .grade-excellent { background: var(--success-light); color: var(--success); }
+    .grade-good { background: var(--info-light); color: var(--info); }
+    .grade-warning { background: var(--warning-light); color: var(--warning); }
+    .grade-danger { background: var(--danger-light); color: var(--danger); }
+
+    /* Alert / Notification banner */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--gray-900);
+      color: white;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: toastSlideIn 0.3s ease-out;
+      pointer-events: auto;
+    }
+
+    @keyframes toastSlideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Large QR Projection Modal */
+    .projection-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    #modalQrcodeLarge svg {
+      width: 280px;
+      height: 280px;
+      max-width: 70vw;
+      max-height: 70vw;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 12px;
+      background: var(--surface);
+      border: 2px solid var(--gray-200);
+    }
+
+    /* Responsive */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .theme-toggle {
+      border: 1px solid var(--gray-300);
+      background: var(--gray-100);
+      color: var(--gray-800);
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+
+    .theme-toggle:hover {
+      background: var(--gray-200);
+    }
+
+    .group-setup-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .group-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .groups-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .group-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1rem;
+      min-height: 160px;
+    }
+
+    .group-card h4 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .group-member {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 0.45rem 0.6rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+    }
+
+    .group-member select {
+      max-width: 120px;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.4rem;
+    }
+
+    .ai-rationale {
+      display: none;
+      background: var(--primary-light);
+      border: 1px solid var(--gray-200);
+      color: var(--gray-800);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+      .mode-selector {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .student-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .status-btn-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .status-toggle {
+        flex: 1;
+        justify-content: center;
+        padding: 0.4rem 0.2rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .nav-tabs {
+        overflow-x: auto;
+      }
+      .mode-selector {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      header, .nav-tabs, .session-bar, .mode-selector, .mode-panel, .btn, .modal-overlay, .toast-container {
+        display: none !important;
+      }
+      body {
+        background: var(--surface);
+        color: black;
+      }
+      .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+      }
+      .tab-content {
+        display: none !important;
+      }
+      #tab-analytics {
+        display: block !important;
+      }
+      .data-table th, .data-table td {
+        border-color: #ddd !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="nav-container">
+      <div class="logo-area">
+        <div class="logo-icon">✓</div>
+        <div class="logo-text">
+          <h1>智慧課堂多元點名系統</h1>
+          <p>多元簽到 • 課堂分組 • 深淺色模式</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <nav class="nav-tabs">
+          <button class="tab-btn active" data-tab="rollcall" onclick="switchTab('rollcall')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            點名進行
+          </button>
+          <button class="tab-btn" data-tab="analytics" onclick="switchTab('analytics')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            即時統計與成績
+          </button>
+          <button class="tab-btn" data-tab="students" onclick="switchTab('students')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            班級名單管理
+          </button>
+          <button class="tab-btn" data-tab="groups" onclick="switchTab('groups')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            課堂分組
+          </button>
+          <button class="tab-btn" data-tab="history" onclick="switchTab('history')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            歷史紀錄
+          </button>
+        </nav>
+        <button type="button" class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+          🌙 深色模式
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB 1: 點名進行 (Active Roll Call) -->
+    <section id="tab-rollcall" class="tab-content active">
+      <!-- Session Bar: Course, Date, Session -->
+      <div class="session-bar">
+        <div class="form-group">
+          <label class="form-label">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+            選擇課程 / 班級
+          </label>
+          <select id="currentCourseSelect" class="form-control" onchange="onCourseChanged()">
+            <!-- Dynamic options -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            點名日期
+          </label>
+          <input type="date" id="rollCallDate" class="form-control" onchange="onSessionParameterChanged()">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            點名節次 / 場次
+          </label>
+          <select id="rollCallSession" class="form-control" onchange="onSessionParameterChanged()">
+            <option value="第 1 節">第 1 節 (08:10 - 09:00)</option>
+            <option value="第 2 節">第 2 節 (09:10 - 10:00)</option>
+            <option value="第 3 節" selected>第 3 節 (10:10 - 11:00)</option>
+            <option value="第 4 節">第 4 節 (11:10 - 12:00)</option>
+            <option value="第 5 節">第 5 節 (13:30 - 14:20)</option>
+            <option value="第 6 節">第 6 節 (14:30 - 15:20)</option>
+            <option value="第 7 節">第 7 節 (15:30 - 16:20)</option>
+            <option value="第 8 節">第 8 節 (16:30 - 17:20)</option>
+            <option value="早自習/晨會">早自習 / 晨會</option>
+            <option value="活動簽到場次">活動 / 專題講座場次</option>
+          </select>
+        </div>
+
+        <div>
+          <button class="btn btn-secondary" onclick="openSessionSaveModal()" style="width:100%;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            儲存目前場次
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Active Countdown Banner (Appears when countdown is running) -->
+      <div id="countdownBanner" class="countdown-active-banner">
+        <div>
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+            <span style="font-weight:700; font-size:0.95rem;" id="countdownTitle">簽到倒數計時進行中...</span>
+          </div>
+          <p style="font-size:0.8rem; opacity:0.9;">時間結束將自動停止簽到並結算當前出席狀況</p>
+          <div class="timer-progress-bar">
+            <div id="countdownProgress" class="timer-progress-fill"></div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+          <div class="timer-digit" id="countdownTimerDisplay">01:00</div>
+          <button class="btn btn-secondary btn-sm" onclick="openLargeQRModal()" id="btnBannerEnlargeQR" style="display:none; color:white; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4);">
+            🔍 放大投影
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="stopCountdownEarly()">
+            提前結束點名
+          </button>
+        </div>
+      </div>
+
+      <!-- Multi-modal Selection Cards -->
+      <div class="mode-selector">
+        <div class="mode-card active" id="card-mode-manual" onclick="switchRollCallMode('manual')">
+          <div class="mode-icon">👆</div>
+          <div class="mode-info">
+            <h4>手動點名</h4>
+            <p>快速點名、直覺切換5種狀態</p>
+          </div>
+        </div>
+
+        <div class="mode-card" id="card-mode-qrcode" onclick="switchRollCallMode('qrcode')">
+          <div class="mode-icon">📱</div>
+          <div class="mode-info">
+            <h4>QR Code 簽到 <span class="badge-highlight">倒數計時</span></h4>
+            <p>點此顯示 QR Code 與掃碼簽到</p>
+          </div>
+        </div>
+
+        <div class="mode-card" id="card-mode-gps" onclick="switchRollCallMode('gps')">
+          <div class="mode-icon">📍</div>
+          <div class="mode-info">
+            <h4>GPS 定位簽到 <span class="badge-highlight">倒數計時</span></h4>
+            <p>限制教室半徑、防遠端代簽</p>
+          </div>
+        </div>
+
+        <div class="mode-card" id="card-mode-random" onclick="switchRollCallMode('random')">
+          <div class="mode-icon">🎲</div>
+          <div class="mode-info">
+            <h4>隨機抽點</h4>
+            <p>抽籤動畫點名、活絡課堂互動</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 1: Manual Info Panel -->
+      <div id="panel-manual" class="mode-panel active">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <div>
+            <h4 style="font-weight:700; color:var(--gray-900);">手動點名模式</h4>
+            <p style="font-size:0.8rem; color:var(--gray-500);">可點擊下方學生名單快速設定五種出席狀態，支援「一鍵全到」快速登記。</p>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-primary btn-sm" onclick="switchRollCallMode('qrcode')">
+              📱 切換至 QR Code 簽到
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="batchSetAllStatus('present')">
+              ✅ 一鍵全部出席
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="batchResetAllStatus()">
+              🔄 重設所有狀態
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 2: QR Code Panel with Countdown Setup -->
+      <div id="panel-qrcode" class="mode-panel">
+        <div class="countdown-setup-box">
+          <div>
+            <h4 style="font-weight:700; color:var(--gray-900); margin-bottom:0.25rem;">📱 QR Code 掃描簽到設定</h4>
+            <p style="font-size:0.8rem; color:var(--gray-500);">設定簽到開放倒數時間，點擊「開始點名」後啟動倒數計時並記錄學生掃碼打卡。</p>
+          </div>
+          <div class="timer-presets">
+            <span style="font-size:0.85rem; font-weight:600; color:var(--gray-700);">倒數時間：</span>
+            <button class="timer-btn" onclick="selectTimerPreset(30, this)">30 秒</button>
+            <button class="timer-btn active" onclick="selectTimerPreset(60, this)">1 分鐘</button>
+            <button class="timer-btn" onclick="selectTimerPreset(180, this)">3 分鐘</button>
+            <button class="timer-btn" onclick="selectTimerPreset(300, this)">5 分鐘</button>
+            <div style="display:inline-flex; align-items:center; gap:0.25rem;">
+              <input type="number" id="customQRSeconds" placeholder="秒數" style="width:70px; padding:0.3rem 0.5rem; font-size:0.8rem; border:1px solid var(--gray-300); border-radius:6px;">
+              <span style="font-size:0.8rem; color:var(--gray-500);">秒</span>
+            </div>
+            <button class="btn btn-primary" onclick="startCountdownMode('qrcode')">
+              🚀 開始 QR Code 點名
+            </button>
+          </div>
+        </div>
+
+        <div class="qr-container">
+          <div class="qr-box">
+            <div style="font-weight:700; font-size:0.9rem; color:var(--gray-700); display:flex; justify-content:space-between; width:100%; align-items:center;">
+              <span>課堂簽到 QR Code</span>
+              <button class="btn btn-secondary btn-sm" onclick="regenerateQRToken()" title="重新產生簽到代碼" style="padding:2px 8px; font-size:0.75rem;">
+                🔄 換新代碼
+              </button>
+            </div>
+
+            <!-- Crisp Native Inline SVG QR Code Element -->
+            <div id="qrcode"></div>
+
+            <div class="qr-meta">
+              <strong id="qrTokenDisplay" style="color:var(--primary); font-family:monospace; font-size:1.05rem;">SIGNIN_READY</strong><br>
+              <span style="font-size:0.75rem; color:var(--gray-500);">學生可開啟手機相機掃描條碼簽到</span>
+            </div>
+
+            <button class="btn btn-secondary btn-sm" onclick="openLargeQRModal()" style="width:100%; margin-top:4px;">
+              🔍 放大全螢幕投影 (適合投影幕)
+            </button>
+          </div>
+
+          <div class="simulation-box">
+            <h5>
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              學生端掃碼簽到模擬器 (現場即時測試)
+            </h5>
+            <p style="font-size:0.775rem; color:var(--gray-500); margin-bottom:0.75rem;">
+              模擬學生持手機掃描 QR Code 後送出簽到。在倒數或點名時，選擇學生並點擊按鈕：
+            </p>
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+              <select id="qrStudentSelect" class="form-control" style="font-size:0.85rem;">
+                <!-- dynamic options -->
+              </select>
+              <button class="btn btn-success btn-sm" onclick="simulateStudentScan()">
+                模擬掃碼簽到
+              </button>
+            </div>
+            <div id="qrScanLiveFeed" style="max-height:120px; overflow-y:auto; font-size:0.775rem; color:var(--gray-600); background:var(--surface); border-radius:6px; padding:0.5rem; border:1px solid var(--gray-200);">
+              尚未有學生掃碼紀錄...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 3: GPS Panel with Countdown Setup -->
+      <div id="panel-gps" class="mode-panel">
+        <div class="countdown-setup-box">
+          <div>
+            <h4 style="font-weight:700; color:var(--gray-900); margin-bottom:0.25rem;">📍 GPS 定位簽到設定</h4>
+            <p style="font-size:0.8rem; color:var(--gray-500);">設定教室座標與有效半徑，啟動倒數計時讓教室內的學生完成定位打卡。</p>
+          </div>
+          <div class="timer-presets">
+            <span style="font-size:0.85rem; font-weight:600; color:var(--gray-700);">倒數時間：</span>
+            <button class="timer-btn" onclick="selectTimerPreset(30, this)">30 秒</button>
+            <button class="timer-btn" onclick="selectTimerPreset(60, this)">1 分鐘</button>
+            <button class="timer-btn active" onclick="selectTimerPreset(120, this)">2 分鐘</button>
+            <button class="timer-btn" onclick="selectTimerPreset(300, this)">5 分鐘</button>
+            <button class="btn btn-primary" onclick="startCountdownMode('gps')">
+              🚀 開始 GPS 定位點名
+            </button>
+          </div>
+        </div>
+
+        <div class="gps-container">
+          <div class="gps-card">
+            <h5 style="font-weight:700; margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center;">
+              教室中心座標
+              <button class="btn btn-secondary btn-sm" onclick="getCurrentTeacherLocation()">
+                🎯 獲取當前位置
+              </button>
+            </h5>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+              <div>
+                <label style="font-size:0.75rem; color:var(--gray-500);">緯度 (Latitude)</label>
+                <input type="number" step="0.000001" id="classroomLat" class="form-control" value="25.042300">
+              </div>
+              <div>
+                <label style="font-size:0.75rem; color:var(--gray-500);">經度 (Longitude)</label>
+                <input type="number" step="0.000001" id="classroomLng" class="form-control" value="121.535400">
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.75rem; color:var(--gray-500);">允許簽到半徑 (公尺)</label>
+              <select id="gpsAllowedRadius" class="form-control">
+                <option value="50">50 公尺 (一般教室)</option>
+                <option value="100" selected>100 公尺 (大型階梯教室/大樓)</option>
+                <option value="200">200 公尺 (體育場/整個校區)</option>
+                <option value="500">500 公尺 (寬鬆範圍)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="gps-card">
+            <h5 style="font-weight:700; margin-bottom:0.5rem;">
+              學生 GPS 打卡模擬 (現場驗證)
+            </h5>
+            <p style="font-size:0.75rem; color:var(--gray-500); margin-bottom:0.5rem;">
+              可模擬學生在不同距離進行 GPS 定位打卡，距離超過設定半徑將判定為「缺席/無效」：
+            </p>
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+              <select id="gpsStudentSelect" class="form-control" style="font-size:0.85rem;">
+                <!-- dynamic options -->
+              </select>
+              <select id="gpsSimulateDistance" class="form-control" style="width:140px; font-size:0.85rem;">
+                <option value="15">在教室內 (15m)</option>
+                <option value="45">在走廊 (45m)</option>
+                <option value="120">在校門口 (120m)</option>
+                <option value="1500">在宿舍/家裡 (1.5km)</option>
+              </select>
+            </div>
+            <button class="btn btn-success btn-sm" onclick="simulateStudentGPS()">
+              模擬學生 GPS 打卡
+            </button>
+            <div id="gpsScanLiveFeed" style="margin-top:0.5rem; font-size:0.75rem; color:var(--gray-600); background:var(--surface); padding:0.4rem; border-radius:6px; border:1px solid var(--gray-200);">
+              等待打卡資料...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 4: Random Lucky Draw Panel -->
+      <div id="panel-random" class="mode-panel">
+        <div class="random-picker-box">
+          <h4 style="font-weight:700; color:var(--gray-900);">🎲 課堂隨機抽籤點名</h4>
+          <p style="font-size:0.85rem; color:var(--gray-500);">活絡課堂氣氛，隨機抽出一名學生回答問題並即時標記出席狀況</p>
+
+          <div class="random-display-card" id="randomCard">
+            <div class="random-student-name" id="randomStudentName">準備抽籤</div>
+            <div class="random-student-id" id="randomStudentID">點擊下方按鈕開始</div>
+          </div>
+
+          <div class="random-actions">
+            <button class="btn btn-primary" id="btnRollDice" onclick="triggerRandomPick()">
+              🎲 立即抽籤
+            </button>
+            <div id="randomStatusActions" style="display:none; gap:0.4rem;">
+              <button class="btn btn-success btn-sm" onclick="markRandomStudent('present')">設為出席</button>
+              <button class="btn btn-secondary btn-sm" onclick="markRandomStudent('late')">設為遲到</button>
+              <button class="btn btn-danger btn-sm" onclick="markRandomStudent('absent')">設為缺席</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Roll Call Interactive Area (點名互動區) -->
+      <div class="card">
+        <div class="rollcall-header-bar">
+          <div>
+            <h3 class="card-title">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3 3-2-2"/></svg>
+              學生點名互動區
+              <span id="studentCountBadge" style="font-size:0.8rem; font-weight:600; background:var(--gray-100); padding:2px 8px; border-radius:12px; color:var(--gray-600);">共 0 人</span>
+            </h3>
+            <span style="font-size:0.775rem; color:var(--gray-500);">點選狀態即時自動記錄儲存，支援「出席、遲到、缺席、早退、請假」五種狀態切換</span>
+          </div>
+
+          <!-- Real-time Status Counter Chips -->
+          <div class="status-summary-chips" id="statusSummaryChips">
+            <span class="chip chip-present" id="chipCountPresent">出席: 0</span>
+            <span class="chip chip-late" id="chipCountLate">遲到: 0</span>
+            <span class="chip chip-absent" id="chipCountAbsent">缺席: 0</span>
+            <span class="chip chip-early" id="chipCountEarly">早退: 0</span>
+            <span class="chip chip-leave" id="chipCountLeave">請假: 0</span>
+          </div>
+        </div>
+
+        <!-- Student Attendance Interactive List -->
+        <div class="student-grid" id="studentAttendanceList">
+          <!-- Dynamically populated student items -->
+        </div>
+
+        <!-- Bottom Session Actions -->
+        <div style="margin-top:1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; padding-top:1rem; border-top:1px solid var(--gray-100);">
+          <div style="font-size:0.8rem; color:var(--gray-500);">
+            💡 系統會即時將點名狀態自動儲存於瀏覽器中，換頁或重新整理不遺失。
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-secondary btn-sm" onclick="markAllUncheckedAsAbsent()">
+              ⚠️ 將未點名者設為缺席
+            </button>
+            <button class="btn btn-success" onclick="finishCurrentRollCallAndShowSummary()">
+              🏁 結束點名並查看統計
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: 即時統計與成績 (Stats & Grades) -->
+    <section id="tab-analytics" class="tab-content">
+      <!-- Top Overview Metrics -->
+      <div class="stats-summary-grid">
+        <div class="stat-card">
+          <span class="stat-label">當前場次出席率</span>
+          <span class="stat-value" id="metricSessionRate" style="color:var(--primary);">0%</span>
+          <span class="stat-desc" id="metricSessionRatio">0 / 0 人到課</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">應出席總人數</span>
+          <span class="stat-value" id="metricTotalStudents">0</span>
+          <span class="stat-desc">目前班級學生數</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">缺席與異常總計</span>
+          <span class="stat-value" id="metricAbnormalCount" style="color:var(--danger);">0</span>
+          <span class="stat-desc" id="metricAbnormalBreakdown">缺席 0 • 遲到 0 • 早退 0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">班級平均出缺席成績</span>
+          <span class="stat-value" id="metricClassAvgGrade" style="color:var(--success);">100 分</span>
+          <span class="stat-desc">依權重規則自動計算</span>
+        </div>
+      </div>
+
+      <!-- Grading Weights Configuration Bar -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            平時成績 / 出缺席分數 計算計分標準
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="saveGradeWeights()">
+            💾 儲存並重新計算
+          </button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:1rem; align-items:center;">
+          <div class="form-group">
+            <label class="form-label" style="color:var(--success);">出席 (每堂得分%)</label>
+            <input type="number" id="weightPresent" class="form-control" value="100" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--warning);">遲到 (每堂得分%)</label>
+            <input type="number" id="weightLate" class="form-control" value="70" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--orange);">早退 (每堂得分%)</label>
+            <input type="number" id="weightEarly" class="form-control" value="70" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--info);">請假 (每堂得分%)</label>
+            <input type="number" id="weightLeave" class="form-control" value="85" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--danger);">缺席 (每堂得分%)</label>
+            <input type="number" id="weightAbsent" class="form-control" value="0" min="0" max="100">
+          </div>
+        </div>
+        <div style="margin-top:0.75rem; font-size:0.775rem; color:var(--gray-500);">
+          計算公式：學生平時出缺席分數 = (各狀態場次 × 對應權重得分) ÷ 總點名場次。滿分為 100 分。
+        </div>
+      </div>
+
+      <!-- Student Grade & Stats Roster Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            學生出缺席統計與平時成績總表
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-secondary btn-sm" onclick="exportAnalyticsCSV()">
+              📥 匯出 CSV 報表
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="window.print()">
+              🖨️ 列印總表
+            </button>
+          </div>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>座號</th>
+                <th>學號</th>
+                <th>姓名</th>
+                <th>點名場次</th>
+                <th style="color:var(--success);">出席</th>
+                <th style="color:var(--warning);">遲到</th>
+                <th style="color:var(--danger);">缺席</th>
+                <th style="color:var(--orange);">早退</th>
+                <th style="color:var(--info);">請假</th>
+                <th>出席率</th>
+                <th>平時出缺席成績</th>
+                <th>備註 / 狀態提示</th>
+              </tr>
+            </thead>
+            <tbody id="analyticsTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 班級與學生名單管理 (Classes & Students) -->
+    <section id="tab-students" class="tab-content">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+        <!-- Left: Course / Class Management -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+              課程與班級管理
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddCourseModal()">
+              ＋ 新增課程
+            </button>
+          </div>
+
+          <div id="courseListContainer" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <!-- Dynamic course items -->
+          </div>
+        </div>
+
+        <!-- Right: Current Course Roster Management -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                學生名單管理 (<span id="manageCourseTitle">載入中...</span>)
+              </div>
+              <span style="font-size:0.775rem; color:var(--gray-500);">可單筆新增或批次貼上匯入名單</span>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-secondary btn-sm" onclick="openBatchImportModal()">
+                📋 批次匯入
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="openAddStudentModal()">
+                ＋ 新增學生
+              </button>
+            </div>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>學號</th>
+                  <th>姓名</th>
+                  <th>備註</th>
+                  <th style="text-align:right;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="studentManageTableBody">
+                <!-- Dynamically populated students -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: 課堂分組 -->
+    <section id="tab-groups" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">課堂分組</div>
+            <span style="font-size:0.775rem; color:var(--gray-500);" id="groupsCourseHint">依目前課程學生名單分組，支援隨機、手動與 Groq AI。</span>
+          </div>
+          <span id="groqStatusBadge" style="font-size:0.8rem; font-weight:600; background:var(--gray-100); padding:4px 10px; border-radius:12px; color:var(--gray-600);">Groq：檢查中</span>
+        </div>
+
+        <div class="group-setup-grid">
+          <div class="form-group">
+            <label class="form-label">組數</label>
+            <input type="number" min="2" max="20" value="4" id="groupCountInput" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">每組人數（選填，隨機分組用）</label>
+            <input type="number" min="1" max="50" placeholder="留空則依組數平均分配" id="groupSizeInput" class="form-control">
+          </div>
+          <div class="form-group" style="grid-column:1 / -1;">
+            <label class="form-label">AI 分組指示（選填）</label>
+            <input type="text" id="groupAiInstruction" class="form-control" placeholder="例：班代分開、男女混搭、盡量人數平均">
+          </div>
+        </div>
+
+        <div class="group-actions">
+          <button class="btn btn-primary" onclick="requestRandomGroups()">🎲 隨機自動分組</button>
+          <button class="btn btn-secondary" onclick="enableManualGrouping()">✍️ 手動輸入分組</button>
+          <button class="btn btn-success" onclick="requestAiGroups()">🤖 Groq 智慧分組</button>
+          <button class="btn btn-secondary" onclick="saveManualGroups()">💾 儲存目前分組</button>
+        </div>
+
+        <div id="aiGroupRationale" class="ai-rationale"></div>
+        <div id="groupsBoard" class="groups-board">
+          <div class="group-card"><p style="color:var(--gray-500); font-size:0.85rem;">尚未分組。請先選擇組數後使用隨機、手動或 AI 分組。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: 歷史紀錄 (History Records) -->
+    <section id="tab-history" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            歷史點名存檔紀錄
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="clearAllHistoryData()">
+            🗑️ 清空所有歷史紀錄
+          </button>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>課程</th>
+                <th>節次 / 場次</th>
+                <th>點名模式</th>
+                <th>應到人數</th>
+                <th>實到人數</th>
+                <th>出席率</th>
+                <th>紀錄時間</th>
+                <th style="text-align:right;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <!-- Dynamically populated history -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Large QR Code Projection (全螢幕/大螢幕投影模式) -->
+  <div id="modalLargeQR" class="modal-overlay">
+    <div class="modal" style="max-width:480px; text-align:center;">
+      <div class="modal-header">
+        <h3 class="modal-title">📱 課堂簽到 QR Code 投影</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modalLargeQR')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-weight:700; font-size:1.1rem; color:var(--gray-800); margin-bottom:0.25rem;" id="modalLargeCourseName">
+          課程名稱
+        </div>
+        <div style="font-size:0.85rem; color:var(--gray-500); margin-bottom:1rem;" id="modalLargeSessionText">
+          點名場次
+        </div>
+
+        <div class="projection-box">
+          <div id="modalQrcodeLarge"></div>
+          <div style="margin-top:1rem; font-family:monospace; font-size:1.4rem; font-weight:800; color:var(--primary);" id="modalQrTokenLarge">
+            SIGNIN_TOKEN
+          </div>
+          <div style="font-size:0.8rem; color:var(--gray-500); margin-top:0.25rem;">
+            學生請使用手機鏡頭對準上方 QR Code 進行點名簽到
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:center;">
+        <button class="btn btn-secondary" onclick="closeModal('modalLargeQR')">關閉投影</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Instant Attendance Summary (點名結束即時報告) -->
+  <div id="modalSummary" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">🎉 點名結束！出席狀況即時結算報告</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modalSummary')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--primary-light); border:1px solid #bfdbfe; border-radius:var(--radius-sm); padding:1rem; margin-bottom:1.25rem;">
+          <div style="font-weight:700; font-size:1.05rem; color:#1e3a8a;" id="summaryCourseAndSession">
+            課程名稱 • 日期節次
+          </div>
+          <div style="font-size:0.85rem; color:#2563eb; margin-top:0.25rem;" id="summaryTimestamp">
+            結算時間：載入中...
+          </div>
+        </div>
+
+        <div class="stats-summary-grid" style="margin-bottom:1rem;">
+          <div class="stat-card" style="padding:0.75rem;">
+            <span class="stat-label">本次出席率</span>
+            <span class="stat-value" id="summaryRate" style="color:var(--primary); font-size:1.5rem;">0%</span>
+          </div>
+          <div class="stat-card" style="padding:0.75rem;">
+            <span class="stat-label">本次評分平均</span>
+            <span class="stat-value" id="summaryAvgScore" style="color:var(--success); font-size:1.5rem;">0 分</span>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:0.5rem; text-align:center; margin-bottom:1.25rem;">
+          <div style="background:var(--success-light); padding:0.5rem; border-radius:8px;">
+            <div style="font-size:0.75rem; color:var(--success); font-weight:600;">出席</div>
+            <div style="font-size:1.25rem; font-weight:800; color:var(--success);" id="summaryCountPresent">0</div>
+          </div>
+          <div style="background:var(--warning-light); padding:0.5rem; border-radius:8px;">
+            <div style="font-size:0.75rem; color:var(--warning); font-weight:600;">遲到</div>
+            <div style="font-size:1.25rem; font-weight:800; color:var(--warning);" id="summaryCountLate">0</div>
+          </div>
+          <div style="background:var(--danger-light); padding:0.5rem; border-radius:8px;">
+            <div style="font-size:0.75rem; color:var(--danger); font-weight:600;">缺席</div>
+            <div style="font-size:1.25rem; font-weight:800; color:var(--danger);" id="summaryCountAbsent">0</div>
+          </div>
+          <div style="background:var(--orange-light); padding:0.5rem; border-radius:8px;">
+            <div style="font-size:0.75rem; color:var(--orange); font-weight:600;">早退</div>
+            <div style="font-size:1.25rem; font-weight:800; color:var(--orange);" id="summaryCountEarly">0</div>
+          </div>
+          <div style="background:var(--info-light); padding:0.5rem; border-radius:8px;">
+            <div style="font-size:0.75rem; color:var(--info); font-weight:600;">請假</div>
+            <div style="font-size:1.25rem; font-weight:800; color:var(--info);" id="summaryCountLeave">0</div>
+          </div>
+        </div>
+
+        <div id="summaryAbnormalListContainer">
+          <h5 style="font-size:0.875rem; font-weight:700; color:var(--gray-800); margin-bottom:0.5rem;">異常出缺名單 (缺席 / 遲到 / 請假 / 早退)：</h5>
+          <div id="summaryAbnormalList" style="max-height:160px; overflow-y:auto; border:1px solid var(--gray-200); border-radius:6px; padding:0.5rem; font-size:0.825rem; background:var(--gray-50);">
+            <!-- list -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modalSummary')">關閉</button>
+        <button class="btn btn-primary" onclick="closeModal('modalSummary'); switchTab('analytics');">前往成績統計表</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add / Edit Course -->
+  <div id="modalCourse" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="courseModalTitle">新增課程</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modalCourse')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editCourseId">
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label class="form-label">課程名稱 *</label>
+          <input type="text" id="courseInputName" class="form-control" placeholder="例：網頁程式設計、微積分 (一)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">班級代碼 / 說明</label>
+          <input type="text" id="courseInputCode" class="form-control" placeholder="例：資工二甲、商管進修班">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modalCourse')">取消</button>
+        <button class="btn btn-primary" onclick="submitCourseForm()">確認儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add / Edit Student -->
+  <div id="modalStudent" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="studentModalTitle">新增學生</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modalStudent')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editStudentOriginalNo">
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label class="form-label">學號 / 座號 *</label>
+          <input type="text" id="studentInputNo" class="form-control" placeholder="例：110101">
+        </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label class="form-label">姓名 *</label>
+          <input type="text" id="studentInputName" class="form-control" placeholder="例：陳大明">
+        </div>
+        <div class="form-group">
+          <label class="form-label">備註 (選填)</label>
+          <input type="text" id="studentInputNote" class="form-control" placeholder="例：班代、球隊隊長">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modalStudent')">取消</button>
+        <button class="btn btn-primary" onclick="submitStudentForm()">確認儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Batch Import Students -->
+  <div id="modalBatchImport" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 批次匯入學生名單</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modalBatchImport')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.825rem; color:var(--gray-600); margin-bottom:0.75rem;">
+          請將學生名單貼於下方文字框，每一行為一位學生。<br>
+          格式支援：<strong>學號 姓名</strong> 或 <strong>學號,姓名</strong> 或 <strong>姓名</strong> (空格或逗號隔開)：
+        </p>
+        <textarea id="batchImportText" class="form-control" rows="8" style="font-family:monospace; font-size:0.85rem;" placeholder="11201 王小明&#10;11202 李大華&#10;11203 張美玲&#10;11204 林子軒"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modalBatchImport')">取消</button>
+        <button class="btn btn-primary" onclick="executeBatchImport()">開始匯入名單</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- EMBEDDED PURE JAVASCRIPT QR CODE GENERATOR (100% OFFLINE, ZERO EXTERNAL DEPENDENCY) -->
+  <script>
+    var qrcode=function(){function i(t,r){function a(t,r){g=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(l=4*u+17),e(0,0),e(l-7,0),e(0,l-7),i(),o(),v(t,r),7<=u&&h(t),null==n&&(n=w(u,f,c)),d(n,r)}var u=t,f=y[r],g=null,l=0,n=null,c=[],s={},e=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||l<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||l<=r+n||(g[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},o=function(){for(var t=8;t<l-8;t+=1)null==g[t][6]&&(g[t][6]=t%2==0);for(var r=8;r<l-8;r+=1)null==g[6][r]&&(g[6][r]=r%2==0)},i=function(){for(var t=B.getPatternPosition(u),r=0;r<t.length;r+=1)for(var e=0;e<t.length;e+=1){var n=t[r],o=t[e];if(null==g[n][o])for(var i=-2;i<=2;i+=1)for(var a=-2;a<=2;a+=1)g[n+i][o+a]=-2==i||2==i||-2==a||2==a||0==i&&0==a}},h=function(t){for(var r=B.getBCHTypeNumber(u),e=0;e<18;e+=1){var n=!t&&1==(r>>e&1);g[Math.floor(e/3)][e%3+l-8-3]=n}for(e=0;e<18;e+=1){n=!t&&1==(r>>e&1);g[e%3+l-8-3][Math.floor(e/3)]=n}},v=function(t,r){for(var e=f<<3|r,n=B.getBCHTypeInfo(e),o=0;o<15;o+=1){var i=!t&&1==(n>>o&1);o<6?g[o][8]=i:o<8?g[o+1][8]=i:g[l-15+o][8]=i}for(o=0;o<15;o+=1){i=!t&&1==(n>>o&1);o<8?g[8][l-o-1]=i:o<9?g[8][15-o-1+1]=i:g[8][15-o-1]=i}g[l-8][8]=!t},d=function(t,r){for(var e=-1,n=l-1,o=7,i=0,a=B.getMaskFunction(r),u=l-1;0<u;u-=2)for(6==u&&(u-=1);;){for(var f=0;f<2;f+=1)if(null==g[n][u-f]){var c=!1;i<t.length&&(c=1==(t[i]>>>o&1)),a(n,u-f)&&(c=!c),g[n][u-f]=c,-1==(o-=1)&&(i+=1,o=7)}if((n+=e)<0||l<=n){n-=e,e=-e;break}}},w=function(t,r,e){for(var n=b.getRSBlocks(t,r),o=M(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=C(i[u],l.getLength()-1).mod(l);a[u]=new Array(l.getLength()-1);for(g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=0<=s?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};s.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=x(t);break;case"Alphanumeric":e=m(t);break;case"Byte":e=L(t);break;case"Kanji":e=D(t);break;default:throw"mode:"+r}c.push(e),n=null},s.isDark=function(t,r){if(t<0||l<=t||r<0||l<=r)throw t+","+r;return g[t][r]},s.getModuleCount=function(){return l},s.make=function(){if(u<1){for(var t=1;t<40;t++){for(var r=b.getRSBlocks(t,f),e=M(),n=0;n<c.length;n++){var o=c[n];e.put(o.getMode(),4),e.put(o.getLength(),B.getLengthInBits(o.getMode(),t)),o.write(e)}var i=0;for(n=0;n<r.length;n++)i+=r[n].dataCount;if(e.getLengthInBits()<=8*i)break}u=t}a(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){a(!0,e);var n=B.getLostPoint(s);(0==e||n<t)&&(t=n,r=e)}return r}())},s.createSvgTag=function(t,r,e,n){var o={};"object"==typeof t&&(t=(o=t).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||4,r=void 0===r?4*t:r;var i,a,u,f,c=s.getModuleCount()*t+2*r,g="";for(f="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",g+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',g+=o.scalable?"":' width="'+c+'px" height="'+c+'px"',g+=' viewBox="0 0 '+c+" "+c+'" ',g+=' preserveAspectRatio="xMinYMin meet">',g+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',g+='<path d="',a=0;a<s.getModuleCount();a+=1)for(u=a*t+r,i=0;i<s.getModuleCount();i+=1)s.isDark(a,i)&&(g+="M"+(i*t+r)+","+u+f);return g+='" stroke="transparent" fill="#0f172a"/>',g+="</svg>"};return s;}var r,t,a=1,u=2,o=4,f=8,y={L:1,M:0,Q:3,H:2},e=0,n=1,c=2,g=3,l=4,h=5,s=6,v=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],(t={}).getBCHTypeInfo=function(t){for(var r=t<<10;0<=d(r)-d(1335);)r^=1335<<d(r)-d(1335);return 21522^(t<<10|r)},t.getBCHTypeNumber=function(t){for(var r=t<<12;0<=d(r)-d(7973);)r^=7973<<d(r)-d(7973);return t<<12|r},t.getPatternPosition=function(t){return r[t-1]},t.getMaskFunction=function(t){switch(t){case e:return function(t,r){return(t+r)%2==0};case n:return function(t,r){return t%2==0};case c:return function(t,r){return r%3==0};case g:return function(t,r){return(t+r)%3==0};case l:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case h:return function(t,r){return t*r%2+t*r%3==0};case s:return function(t,r){return(t*r%2+t*r%3)%2==0};case v:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},t.getErrorCorrectPolynomial=function(t){for(var r=C([1],0),e=0;e<t;e+=1)r=r.multiply(C([1,w.gexp(e)],0));return r},t.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case o:case f:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case o:return 16;case f:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case o:return 16;case f:return 12;default:throw"mode:"+t}}},t.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);5<i&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},t);function d(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r}var w=function(){for(var r=new Array(256),e=new Array(256),t=0;t<8;t+=1)r[t]=1<<t;for(t=8;t<256;t+=1)r[t]=r[t-4]^r[t-5]^r[t-6]^r[t-8];for(t=0;t<255;t+=1)e[r[t]]=t;var n={glog:function(t){if(t<1)throw"glog("+t+")";return e[t]},gexp:function(t){for(;t<0;)t+=255;for(;256<=t;)t-=255;return r[t]}};return n}();function C(n,o){if(void 0===n.length)throw n.length+"/"+o;var r=function(){for(var t=0;t<n.length&&0==n[t];)t+=1;for(var r=new Array(n.length-t+o),e=0;e<n.length-t;e+=1)r[e]=n[e+t];return r}(),i={getAt:function(t){return r[t]},getLength:function(){return r.length},multiply:function(t){for(var r=new Array(i.getLength()+t.getLength()-1),e=0;e<i.getLength();e+=1)for(var n=0;n<t.getLength();n+=1)r[e+n]^=w.gexp(w.glog(i.getAt(e))+w.glog(t.getAt(n)));return C(r,0)},mod:function(t){if(i.getLength()-t.getLength()<0)return i;for(var r=w.glog(i.getAt(0))-w.glog(t.getAt(0)),e=new Array(i.getLength()),n=0;n<i.getLength();n+=1)e[n]=i.getAt(n);for(n=0;n<t.getLength();n+=1)e[n]^=w.gexp(w.glog(t.getAt(n))+r);return C(e,0).mod(t)}};return i}var k,A,b=(k=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12]],(A={}).getRSBlocks=function(t,r){var e=function(t,r){switch(r){case y.L:return k[4*(t-1)+0];case y.M:return k[4*(t-1)+1];case y.Q:return k[4*(t-1)+2];case y.H:return k[4*(t-1)+3];default:return}}(t,r);if(void 0===e)throw"bad rs block @ typeNumber:"+t+"/errorCorrectionLevel:"+r;for(var n,o,i=e.length/3,a=[],u=0;u<i;u+=1)for(var f=e[3*u+0],c=e[3*u+1],g=e[3*u+2],l=0;l<f;l+=1)a.push((n=g,o=void 0,(o={}).totalCount=c,o.dataCount=n,o));return a},A),M=function(){var e=[],n=0,o={getBuffer:function(){return e},getAt:function(t){var r=Math.floor(t/8);return 1==(e[r]>>>7-t%8&1)},put:function(t,r){for(var e=0;e<r;e+=1)o.putBit(1==(t>>>r-e-1&1))},getLengthInBits:function(){return n},putBit:function(t){var r=Math.floor(n/8);e.length<=r&&e.push(0),t&&(e[r]|=128>>>n%8),n+=1}};return o},x=function(t){var r=a,n=t,e={getMode:function(){return r},getLength:function(t){return n.length},write:function(t){for(var r=n,e=0;e+2<r.length;)t.put(o(r.substring(e,e+3)),10),e+=3;e<r.length&&(r.length-e==1?t.put(o(r.substring(e,e+1)),4):r.length-e==2&&t.put(o(r.substring(e,e+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return e},m=function(t){var r=u,n=t,e={getMode:function(){return r},getLength:function(t){return n.length},write:function(t){for(var r=n,e=0;e+1<r.length;)t.put(45*o(r.charAt(e))+o(r.charAt(e+1)),11),e+=2;e<r.length&&t.put(o(r.charAt(e)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return e},L=function(t){var r=o,e=function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||57344<=n?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t),n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=0;r<e.length;r+=1)t.put(e[r],8)}};return n},D=function(t){throw"Kanji not supported"};return i}();
+  </script>
+
+  <!-- Application Logic JavaScript -->
+  <script>
+    /**
+     * Default Initial Seed Data
+     */
+    const DEFAULT_COURSES = [
+      {
+        id: 'c_101',
+        name: '網頁前端程式設計',
+        code: '資工系二甲',
+        students: [
+          { studentNo: 'B11201', name: '王小明', note: '班長' },
+          { studentNo: 'B11202', name: '李大華', note: '副班長' },
+          { studentNo: 'B11203', name: '張小玲', note: '' },
+          { studentNo: 'B11204', name: '陳建豪', note: '' },
+          { studentNo: 'B11205', name: '林子軒', note: '學藝股長' },
+          { studentNo: 'B11206', name: '黃怡君', note: '' },
+          { studentNo: 'B11207', name: '趙冠廷', note: '' },
+          { studentNo: 'B11208', name: '周佳蓉', note: '' },
+          { studentNo: 'B11209', name: '吳志強', note: '' },
+          { studentNo: 'B11210', name: '楊雅婷', note: '' }
+        ]
+      },
+      {
+        id: 'c_102',
+        name: '微積分與資料分析',
+        code: '資管系一乙',
+        students: [
+          { studentNo: 'M11301', name: '劉宇倫', note: '' },
+          { studentNo: 'M11302', name: '蔡欣怡', note: '' },
+          { studentNo: 'M11303', name: '許文傑', note: '' },
+          { studentNo: 'M11304', name: '鄭巧涵', note: '' },
+          { studentNo: 'M11305', name: '宋承憲', note: '' },
+          { studentNo: 'M11306', name: '何芳儀', note: '' }
+        ]
+      }
+    ];
+
+    const DEFAULT_WEIGHTS = {
+      present: 100,
+      late: 70,
+      early: 70,
+      leave: 85,
+      absent: 0
+    };
+
+    /**
+     * Application State
+     */
+    let appData = {
+      courses: [],
+      currentCourseId: '',
+      historySessions: [],
+      gradeWeights: { ...DEFAULT_WEIGHTS }
+    };
+
+    // Current working roll call session state
+    let currentSession = {
+      courseId: '',
+      date: '',
+      session: '第 3 節',
+      mode: 'manual', // manual | qrcode | gps | random
+      records: {}, // { [studentNo]: 'present' | 'late' | 'absent' | 'early' | 'leave' }
+      notes: {}    // { [studentNo]: string }
+    };
+
+    // Countdown Timer State
+    let countdownState = {
+      timerId: null,
+      totalSeconds: 60,
+      remainingSeconds: 60,
+      mode: 'qrcode',
+      token: ''
+    };
+
+    // Random roll call candidate
+    let currentRandomCandidate = null;
+
+    /**
+     * Initialization on Page Load
+     */
+    let currentGroupsState = { groups: [], method: '', rationale: '' };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadStorageData();
+      initDateInput();
+      renderCourseOptions();
+      onCourseChanged();
+      renderHistoryTable();
+      renderGradeWeightsInputs();
+      checkGroqHealth();
+      loadSavedGroups();
+      // Generate QR Code immediately on load so it's always ready!
+      initOrUpdateQRCode();
+    });
+
+    /**
+     * LocalStorage Handling
+     */
+    function loadStorageData() {
+      try {
+        const storedCourses = localStorage.getItem('agy_courses');
+        const storedHistory = localStorage.getItem('agy_history');
+        const storedWeights = localStorage.getItem('agy_weights');
+
+        appData.courses = storedCourses ? JSON.parse(storedCourses) : JSON.parse(JSON.stringify(DEFAULT_COURSES));
+        appData.historySessions = storedHistory ? JSON.parse(storedHistory) : [];
+        appData.gradeWeights = storedWeights ? JSON.parse(storedWeights) : { ...DEFAULT_WEIGHTS };
+
+        if (appData.courses.length > 0) {
+          appData.currentCourseId = appData.courses[0].id;
+        }
+      } catch (e) {
+        console.error('Failed to load localStorage', e);
+        appData.courses = JSON.parse(JSON.stringify(DEFAULT_COURSES));
+        appData.historySessions = [];
+        appData.gradeWeights = { ...DEFAULT_WEIGHTS };
+      }
+    }
+
+    function saveAppData() {
+      try {
+        localStorage.setItem('agy_courses', JSON.stringify(appData.courses));
+        localStorage.setItem('agy_history', JSON.stringify(appData.historySessions));
+        localStorage.setItem('agy_weights', JSON.stringify(appData.gradeWeights));
+      } catch (e) {
+        console.error('Failed to save to localStorage', e);
+      }
+    }
+
+    function initDateInput() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const today = `${year}-${month}-${day}`;
+      document.getElementById('rollCallDate').value = today;
+      currentSession.date = today;
+      currentSession.session = document.getElementById('rollCallSession').value;
+    }
+
+    /**
+     * Tab Switching
+     */
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+      });
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+      const targetTab = document.getElementById(`tab-${tabId}`);
+      if (targetTab) {
+        targetTab.classList.add('active');
+      }
+
+      if (tabId === 'analytics') renderAnalyticsView();
+      if (tabId === 'students') renderManageView();
+      if (tabId === 'history') renderHistoryTable();
+      if (tabId === 'groups') {
+        loadSavedGroups();
+        renderGroupsBoard();
+      }
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('agy_theme') || 'light';
+      applyTheme(saved);
+    }
+
+    function applyTheme(theme) {
+      const next = theme === 'dark' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('agy_theme', next);
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) {
+        btn.textContent = next === 'dark' ? '☀️ 淺色模式' : '🌙 深色模式';
+      }
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    async function checkGroqHealth() {
+      const badge = document.getElementById('groqStatusBadge');
+      try {
+        const res = await fetch('/api/health');
+        const data = await res.json();
+        if (badge) {
+          badge.textContent = data.groq_configured ? `Groq 已連線（${data.model}）` : 'Groq 未設定金鑰';
+        }
+      } catch (e) {
+        if (badge) badge.textContent = '請用 Flask 啟動才能使用分組 API';
+      }
+    }
+
+    function getGroupCount() {
+      return Math.max(2, parseInt(document.getElementById('groupCountInput').value, 10) || 2);
+    }
+
+    async function apiPost(url, body) {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.ok === false) {
+        throw new Error(data.error || '伺服器回應失敗');
+      }
+      return data;
+    }
+
+    async function loadSavedGroups() {
+      const course = getCurrentCourse();
+      const hint = document.getElementById('groupsCourseHint');
+      if (hint && course) {
+        hint.textContent = `目前課程：${course.name}（${course.students.length} 人）。支援隨機自動、手動輸入，以及 Groq AI 分組。`;
+      }
+      if (!course) return;
+      try {
+        const res = await fetch(`/api/groups?course_id=${encodeURIComponent(course.id)}`);
+        const data = await res.json();
+        if (data.ok && data.data && Array.isArray(data.data.groups)) {
+          currentGroupsState = {
+            groups: data.data.groups,
+            method: data.data.method || '',
+            rationale: data.data.rationale || ''
+          };
+          renderGroupsBoard();
+        }
+      } catch (e) {
+        // Flask 未啟動時仍可在前端手動預覽
+      }
+    }
+
+    function buildEmptyGroups(count) {
+      const course = getCurrentCourse();
+      const students = course ? course.students.slice() : [];
+      const groups = Array.from({ length: count }, (_, i) => ({
+        id: i + 1,
+        name: `第 ${i + 1} 組`,
+        members: []
+      }));
+      students.forEach((student, index) => {
+        groups[index % count].members.push(student);
+      });
+      return groups;
+    }
+
+    function renderGroupsBoard() {
+      const board = document.getElementById('groupsBoard');
+      const rationaleBox = document.getElementById('aiGroupRationale');
+      if (!board) return;
+
+      if (rationaleBox) {
+        if (currentGroupsState.rationale) {
+          rationaleBox.style.display = 'block';
+          rationaleBox.textContent = `AI 說明：${currentGroupsState.rationale}`;
+        } else {
+          rationaleBox.style.display = 'none';
+        }
+      }
+
+      const groups = currentGroupsState.groups || [];
+      if (!groups.length) {
+        board.innerHTML = '<div class="group-card"><p style="color:var(--gray-500); font-size:0.85rem;">尚未分組。請先選擇組數後使用隨機、手動或 AI 分組。</p></div>';
+        return;
+      }
+
+      const groupOptions = groups.map((g, i) => `<option value="${i}">${g.name || `第 ${i + 1} 組`}</option>`).join('');
+      board.innerHTML = groups.map((group, groupIndex) => {
+        const members = (group.members || []).map((member, memberIndex) => `
+          <div class="group-member">
+            <div>
+              <strong>${member.name || ''}</strong>
+              <div style="font-size:0.75rem; color:var(--gray-500);">${member.studentNo || ''}</div>
+            </div>
+            <select onchange="moveStudentToGroup(${groupIndex}, ${memberIndex}, this.value)">
+              ${groupOptions.replace(`value="${groupIndex}"`, `value="${groupIndex}" selected`)}
+            </select>
+          </div>
+        `).join('');
+        return `
+          <div class="group-card">
+            <h4>
+              <input class="form-control" value="${group.name || `第 ${groupIndex + 1} 組`}" onchange="renameGroup(${groupIndex}, this.value)" style="font-weight:700;">
+              <span style="font-size:0.8rem; color:var(--gray-500);">${(group.members || []).length} 人</span>
+            </h4>
+            ${members || '<p style="color:var(--gray-500); font-size:0.8rem;">此組目前沒有成員</p>'}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renameGroup(index, name) {
+      if (!currentGroupsState.groups[index]) return;
+      currentGroupsState.groups[index].name = name.trim() || `第 ${index + 1} 組`;
+    }
+
+    function moveStudentToGroup(fromIndex, memberIndex, toIndex) {
+      const target = parseInt(toIndex, 10);
+      if (fromIndex === target) return;
+      const student = currentGroupsState.groups[fromIndex].members.splice(memberIndex, 1)[0];
+      if (!student) return;
+      currentGroupsState.groups[target].members.push(student);
+      currentGroupsState.method = 'manual';
+      renderGroupsBoard();
+    }
+
+    async function requestRandomGroups() {
+      const course = getCurrentCourse();
+      if (!course) return showToast('請先選擇課程');
+      const sizeVal = parseInt(document.getElementById('groupSizeInput').value, 10);
+      const body = {
+        course_id: course.id,
+        students: course.students,
+        group_count: getGroupCount()
+      };
+      if (sizeVal > 0) body.size_per_group = sizeVal;
+      try {
+        const data = await apiPost('/api/groups/random', body);
+        currentGroupsState = { groups: data.data.groups, method: 'random', rationale: '' };
+        renderGroupsBoard();
+        showToast('已完成隨機自動分組');
+      } catch (e) {
+        const students = course.students.slice();
+        for (let i = students.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [students[i], students[j]] = [students[j], students[i]];
+        }
+        const sizeVal = parseInt(document.getElementById('groupSizeInput').value, 10);
+        const count = sizeVal > 0
+          ? Math.max(1, Math.ceil(students.length / sizeVal))
+          : getGroupCount();
+        const groups = Array.from({ length: count }, (_, i) => ({ id: i + 1, name: `第 ${i + 1} 組`, members: [] }));
+        students.forEach((student, index) => groups[index % count].members.push(student));
+        currentGroupsState = { groups, method: 'random', rationale: '' };
+        renderGroupsBoard();
+        showToast('Flask 尚未連線，已在瀏覽器完成本地隨機分組');
+      }
+    }
+
+    function enableManualGrouping() {
+      currentGroupsState = {
+        groups: buildEmptyGroups(getGroupCount()),
+        method: 'manual',
+        rationale: ''
+      };
+      renderGroupsBoard();
+      showToast('已進入手動分組：可用下拉選單把學生移到其他組，完成後按儲存');
+    }
+
+    async function saveManualGroups() {
+      const course = getCurrentCourse();
+      if (!course) return showToast('請先選擇課程');
+      if (!currentGroupsState.groups.length) return showToast('目前沒有可儲存的分組');
+      try {
+        const data = await apiPost('/api/groups/manual', {
+          course_id: course.id,
+          groups: currentGroupsState.groups
+        });
+        currentGroupsState = { groups: data.data.groups, method: 'manual', rationale: '' };
+        renderGroupsBoard();
+        showToast('已儲存手動分組');
+      } catch (e) {
+        showToast(e.message || '儲存失敗，請確認已啟動 Flask');
+      }
+    }
+
+    async function requestAiGroups() {
+      const course = getCurrentCourse();
+      if (!course) return showToast('請先選擇課程');
+      showToast('正在透過 Groq 進行智慧分組...');
+      try {
+        const data = await apiPost('/api/groups/ai', {
+          course_id: course.id,
+          students: course.students,
+          group_count: getGroupCount(),
+          instruction: document.getElementById('groupAiInstruction').value
+        });
+        currentGroupsState = {
+          groups: data.data.groups,
+          method: 'ai',
+          rationale: data.data.rationale || ''
+        };
+        renderGroupsBoard();
+        showToast('Groq 智慧分組完成');
+      } catch (e) {
+        showToast(e.message || 'Groq 分組失敗');
+      }
+    }
+
+    /**
+     * Course Selection & Management
+     */
+    function renderCourseOptions() {
+      const select = document.getElementById('currentCourseSelect');
+      select.innerHTML = '';
+      appData.courses.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.name} (${c.code}) - ${c.students.length} 人`;
+        select.appendChild(opt);
+      });
+      if (appData.currentCourseId) {
+        select.value = appData.currentCourseId;
+      }
+    }
+
+    function onCourseChanged() {
+      const select = document.getElementById('currentCourseSelect');
+      appData.currentCourseId = select.value;
+      currentSession.courseId = select.value;
+
+      const course = getCurrentCourse();
+      if (course) {
+        currentSession.records = {};
+        currentSession.notes = {};
+        course.students.forEach(st => {
+          currentSession.records[st.studentNo] = 'present';
+        });
+      }
+
+      renderStudentRollCallList();
+      updateSimulatorStudentSelects();
+      updateStatusSummaryChips();
+      initOrUpdateQRCode();
+      loadSavedGroups();
+    }
+
+    function onSessionParameterChanged() {
+      currentSession.date = document.getElementById('rollCallDate').value;
+      currentSession.session = document.getElementById('rollCallSession').value;
+      initOrUpdateQRCode();
+    }
+
+    function getCurrentCourse() {
+      return appData.courses.find(c => c.id === appData.currentCourseId) || appData.courses[0];
+    }
+
+    /**
+     * Multi-modal Switcher
+     */
+    function switchRollCallMode(mode) {
+      currentSession.mode = mode;
+      
+      const modeCards = {
+        'manual': document.getElementById('card-mode-manual'),
+        'qrcode': document.getElementById('card-mode-qrcode'),
+        'gps': document.getElementById('card-mode-gps'),
+        'random': document.getElementById('card-mode-random')
+      };
+
+      Object.values(modeCards).forEach(card => card && card.classList.remove('active'));
+      if (modeCards[mode]) modeCards[mode].classList.add('active');
+
+      document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+      const activePanel = document.getElementById(`panel-${mode}`);
+      if (activePanel) activePanel.classList.add('active');
+
+      // If switching to QR Code mode, ensure QR Code is rendered
+      if (mode === 'qrcode') {
+        initOrUpdateQRCode();
+        const bannerEnlargeBtn = document.getElementById('btnBannerEnlargeQR');
+        if (bannerEnlargeBtn) bannerEnlargeBtn.style.display = 'inline-flex';
+      } else {
+        const bannerEnlargeBtn = document.getElementById('btnBannerEnlargeQR');
+        if (bannerEnlargeBtn) bannerEnlargeBtn.style.display = 'none';
+      }
+    }
+
+    /**
+     * Timer Preset Selection
+     */
+    function selectTimerPreset(seconds, btnElement) {
+      countdownState.totalSeconds = seconds;
+      countdownState.remainingSeconds = seconds;
+      const parent = btnElement.closest('.timer-presets');
+      if (parent) {
+        parent.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
+      showToast(`已設定倒數時間為 ${seconds} 秒`);
+    }
+
+    /**
+     * Countdown Logic (Timer Start, Tick, Stop, Finish)
+     */
+    function startCountdownMode(mode) {
+      if (mode === 'qrcode') {
+        const customSec = parseInt(document.getElementById('customQRSeconds').value);
+        if (customSec && customSec > 0) {
+          countdownState.totalSeconds = customSec;
+          countdownState.remainingSeconds = customSec;
+        }
+      }
+
+      countdownState.mode = mode;
+      countdownState.remainingSeconds = countdownState.totalSeconds;
+      regenerateQRToken();
+
+      const banner = document.getElementById('countdownBanner');
+      banner.classList.add('active');
+
+      const title = mode === 'qrcode' ? '📱 QR Code 掃碼簽到倒數進行中...' : '📍 GPS 定位簽到倒數進行中...';
+      document.getElementById('countdownTitle').textContent = title;
+
+      const bannerEnlargeBtn = document.getElementById('btnBannerEnlargeQR');
+      if (bannerEnlargeBtn) {
+        bannerEnlargeBtn.style.display = mode === 'qrcode' ? 'inline-flex' : 'none';
+      }
+
+      playAudioBeep(600, 0.1);
+      showToast(`🚀 開始${mode === 'qrcode' ? 'QR Code' : 'GPS'}點名！倒數計時 ${countdownState.totalSeconds} 秒`);
+
+      if (countdownState.timerId) {
+        clearInterval(countdownState.timerId);
+      }
+
+      updateCountdownDisplay();
+
+      countdownState.timerId = setInterval(() => {
+        countdownState.remainingSeconds--;
+        updateCountdownDisplay();
+
+        if (countdownState.remainingSeconds <= 5 && countdownState.remainingSeconds > 0) {
+          playAudioBeep(800, 0.08);
+        }
+
+        if (countdownState.remainingSeconds <= 0) {
+          clearInterval(countdownState.timerId);
+          countdownState.timerId = null;
+          onCountdownFinished();
+        }
+      }, 1000);
+    }
+
+    function updateCountdownDisplay() {
+      const minutes = Math.floor(countdownState.remainingSeconds / 60);
+      const seconds = countdownState.remainingSeconds % 60;
+      const str = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      document.getElementById('countdownTimerDisplay').textContent = str;
+
+      const percent = (countdownState.remainingSeconds / countdownState.totalSeconds) * 100;
+      document.getElementById('countdownProgress').style.width = `${Math.max(0, percent)}%`;
+    }
+
+    function stopCountdownEarly() {
+      if (countdownState.timerId) {
+        clearInterval(countdownState.timerId);
+        countdownState.timerId = null;
+      }
+      onCountdownFinished(true);
+    }
+
+    function onCountdownFinished(isEarly = false) {
+      document.getElementById('countdownBanner').classList.remove('active');
+      playAudioSuccessChime();
+      showToast(isEarly ? '🛑 點名倒數已提前結束' : '⏰ 簽到倒數計時結束！已為您統計出席狀態');
+      finishCurrentRollCallAndShowSummary();
+    }
+
+    /**
+     * Web Audio API Synthesizer (Zero external audio files needed!)
+     */
+    function playAudioBeep(freq = 600, duration = 0.1) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playAudioSuccessChime() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, index) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.value = freq;
+          const startTime = audioCtx.currentTime + index * 0.12;
+          gain.gain.setValueAtTime(0.15, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+          osc.start(startTime);
+          osc.stop(startTime + 0.3);
+        });
+      } catch (e) {}
+    }
+
+    /**
+     * Native Clean QR Code Generation using embedded QRCode Engine
+     */
+    function regenerateQRToken() {
+      countdownState.token = 'SIGNIN_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      initOrUpdateQRCode();
+    }
+
+    function initOrUpdateQRCode() {
+      const qrEl = document.getElementById('qrcode');
+      if (!qrEl) return;
+
+      const course = getCurrentCourse();
+      if (!countdownState.token) {
+        countdownState.token = 'SIGNIN_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      }
+      const token = countdownState.token;
+
+      // Check-in content to encode in the QR code
+      const checkinPayload = `【課堂點名簽到】\n課程：${course ? course.name : '點名系統'}\n日期：${currentSession.date} ${currentSession.session}\n簽到代碼：${token}\n時間：${new Date().toLocaleTimeString()}`;
+
+      document.getElementById('qrTokenDisplay').textContent = `動態簽到代碼: ${token}`;
+
+      try {
+        const qr = qrcode(0, 'M');
+        qr.addData(checkinPayload, 'Byte');
+        qr.make();
+
+        qrEl.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4, scalable: true });
+
+        const largeQrEl = document.getElementById('modalQrcodeLarge');
+        if (largeQrEl) {
+          largeQrEl.innerHTML = qr.createSvgTag({ cellSize: 7, margin: 4, scalable: true });
+          document.getElementById('modalQrTokenLarge').textContent = token;
+          document.getElementById('modalLargeCourseName').textContent = course ? `${course.name} (${course.code})` : '';
+          document.getElementById('modalLargeSessionText').textContent = `${currentSession.date} ${currentSession.session}`;
+        }
+      } catch (err) {
+        console.error('QR code generation error:', err);
+        qrEl.innerHTML = `<div style="color:var(--danger); padding:1rem; font-size:0.85rem; text-align:center;">QR Code 產生失敗: ${err.message}</div>`;
+      }
+    }
+
+    function openLargeQRModal() {
+      initOrUpdateQRCode();
+      openModal('modalLargeQR');
+    }
+
+    function updateSimulatorStudentSelects() {
+      const course = getCurrentCourse();
+      const qrSelect = document.getElementById('qrStudentSelect');
+      const gpsSelect = document.getElementById('gpsStudentSelect');
+      qrSelect.innerHTML = '';
+      gpsSelect.innerHTML = '';
+
+      if (!course) return;
+
+      course.students.forEach(st => {
+        const opt1 = document.createElement('option');
+        opt1.value = st.studentNo;
+        opt1.textContent = `${st.studentNo} ${st.name}`;
+        qrSelect.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = st.studentNo;
+        opt2.textContent = `${st.studentNo} ${st.name}`;
+        gpsSelect.appendChild(opt2);
+      });
+    }
+
+    function simulateStudentScan() {
+      const studentNo = document.getElementById('qrStudentSelect').value;
+      const course = getCurrentCourse();
+      const student = course.students.find(s => s.studentNo === studentNo);
+      if (!student) return;
+
+      setStudentStatus(studentNo, 'present');
+      playAudioBeep(880, 0.1);
+
+      const timeStr = new Date().toLocaleTimeString();
+      const feed = document.getElementById('qrScanLiveFeed');
+      const item = document.createElement('div');
+      item.style.padding = '4px 0';
+      item.style.borderBottom = '1px dashed #e2e8f0';
+      item.innerHTML = `<span style="color:var(--success); font-weight:700;">[${timeStr}] 掃碼成功</span>: <strong>${student.name}</strong> (${student.studentNo})`;
+      feed.prepend(item);
+
+      showToast(`✅ ${student.name} 完成掃碼簽到！`);
+    }
+
+    /**
+     * GPS Location & Simulator Logic
+     */
+    function getCurrentTeacherLocation() {
+      if ('geolocation' in navigator) {
+        showToast('正在向瀏覽器請求 GPS 座標...');
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            document.getElementById('classroomLat').value = pos.coords.latitude.toFixed(6);
+            document.getElementById('classroomLng').value = pos.coords.longitude.toFixed(6);
+            showToast('✅ 成功獲取當前教室 GPS 座標！');
+          },
+          err => {
+            showToast('⚠️ 無法獲取定位（已採用預設範例教室座標）: ' + err.message);
+          },
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      } else {
+        showToast('瀏覽器不支援 Geolocation API');
+      }
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const phi1 = lat1 * Math.PI / 180;
+      const phi2 = lat2 * Math.PI / 180;
+      const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+      const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+      const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+                Math.cos(phi1) * Math.cos(phi2) *
+                Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function simulateStudentGPS() {
+      const studentNo = document.getElementById('gpsStudentSelect').value;
+      const dist = parseFloat(document.getElementById('gpsSimulateDistance').value);
+      const allowedRadius = parseFloat(document.getElementById('gpsAllowedRadius').value);
+      const course = getCurrentCourse();
+      const student = course.students.find(s => s.studentNo === studentNo);
+      if (!student) return;
+
+      const feed = document.getElementById('gpsScanLiveFeed');
+      const timeStr = new Date().toLocaleTimeString();
+
+      if (dist <= allowedRadius) {
+        setStudentStatus(studentNo, 'present');
+        playAudioBeep(880, 0.1);
+        feed.innerHTML = `<span style="color:var(--success); font-weight:700;">[${timeStr}] 驗證通過</span>: ${student.name} 距教室 ${dist}m (允許範圍內: ≤${allowedRadius}m)`;
+        showToast(`✅ ${student.name} GPS 定位打卡成功！(距離: ${dist}m)`);
+      } else {
+        setStudentStatus(studentNo, 'absent');
+        feed.innerHTML = `<span style="color:var(--danger); font-weight:700;">[${timeStr}] 定位失敗</span>: ${student.name} 距教室 ${dist}m (超出允許範圍 >${allowedRadius}m)`;
+        showToast(`❌ ${student.name} 超出教室範圍！打卡失敗`);
+      }
+    }
+
+    /**
+     * Random Lucky Draw Logic
+     */
+    let isRolling = false;
+    function triggerRandomPick() {
+      if (isRolling) return;
+      const course = getCurrentCourse();
+      if (!course || course.students.length === 0) {
+        showToast('目前班級無學生可抽籤');
+        return;
+      }
+
+      isRolling = true;
+      const btn = document.getElementById('btnRollDice');
+      btn.disabled = true;
+      document.getElementById('randomStatusActions').style.display = 'none';
+
+      let count = 0;
+      const totalSteps = 25;
+      const interval = setInterval(() => {
+        const randIndex = Math.floor(Math.random() * course.students.length);
+        const candidate = course.students[randIndex];
+        document.getElementById('randomStudentName').textContent = candidate.name;
+        document.getElementById('randomStudentID').textContent = candidate.studentNo;
+        playAudioBeep(400 + count * 15, 0.04);
+        count++;
+
+        if (count >= totalSteps) {
+          clearInterval(interval);
+          isRolling = false;
+          btn.disabled = false;
+          currentRandomCandidate = candidate;
+          document.getElementById('randomStatusActions').style.display = 'flex';
+          playAudioBeep(880, 0.25);
+          showToast(`🎯 抽中同學：${candidate.name} (${candidate.studentNo})`);
+        }
+      }, 70);
+    }
+
+    function markRandomStudent(status) {
+      if (!currentRandomCandidate) return;
+      setStudentStatus(currentRandomCandidate.studentNo, status);
+      const statusLabels = { present: '出席', late: '遲到', absent: '缺席' };
+      showToast(`已將 ${currentRandomCandidate.name} 標記為「${statusLabels[status]}」`);
+    }
+
+    /**
+     * Roll Call Interactive List Rendering (5-State Buttons)
+     */
+    function renderStudentRollCallList() {
+      const container = document.getElementById('studentAttendanceList');
+      container.innerHTML = '';
+      const course = getCurrentCourse();
+      if (!course || course.students.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--gray-500);">目前此班級尚無學生資料，請至「班級名單管理」新增學生。</div>`;
+        document.getElementById('studentCountBadge').textContent = '共 0 人';
+        return;
+      }
+
+      document.getElementById('studentCountBadge').textContent = `共 ${course.students.length} 人`;
+
+      course.students.forEach((st, idx) => {
+        const currentStatus = currentSession.records[st.studentNo] || 'present';
+        const row = document.createElement('div');
+        row.className = 'student-row';
+        row.id = `row-${st.studentNo}`;
+
+        row.innerHTML = `
+          <div class="student-info">
+            <span class="student-seq">${String(idx + 1).padStart(2, '0')}</span>
+            <div>
+              <div class="student-name">${st.name}</div>
+              <div class="student-id">${st.studentNo} ${st.note ? `• <span style="color:var(--gray-500);">${st.note}</span>` : ''}</div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+            <div class="status-btn-group">
+              <button class="status-toggle present ${currentStatus === 'present' ? 'active' : ''}" onclick="setStudentStatus('${st.studentNo}', 'present')">
+                <span>出席</span>
+              </button>
+              <button class="status-toggle late ${currentStatus === 'late' ? 'active' : ''}" onclick="setStudentStatus('${st.studentNo}', 'late')">
+                <span>遲到</span>
+              </button>
+              <button class="status-toggle absent ${currentStatus === 'absent' ? 'active' : ''}" onclick="setStudentStatus('${st.studentNo}', 'absent')">
+                <span>缺席</span>
+              </button>
+              <button class="status-toggle early ${currentStatus === 'early' ? 'active' : ''}" onclick="setStudentStatus('${st.studentNo}', 'early')">
+                <span>早退</span>
+              </button>
+              <button class="status-toggle leave ${currentStatus === 'leave' ? 'active' : ''}" onclick="setStudentStatus('${st.studentNo}', 'leave')">
+                <span>請假</span>
+              </button>
+            </div>
+
+            <div class="student-meta">
+              <input type="text" class="note-input" placeholder="備註原因..." value="${currentSession.notes[st.studentNo] || ''}" onchange="setStudentNote('${st.studentNo}', this.value)">
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      updateStatusSummaryChips();
+    }
+
+    function setStudentStatus(studentNo, status) {
+      currentSession.records[studentNo] = status;
+
+      const row = document.getElementById(`row-${studentNo}`);
+      if (row) {
+        row.querySelectorAll('.status-toggle').forEach(btn => {
+          btn.classList.remove('active');
+          if (btn.classList.contains(status)) {
+            btn.classList.add('active');
+          }
+        });
+      }
+
+      updateStatusSummaryChips();
+    }
+
+    function setStudentNote(studentNo, noteText) {
+      currentSession.notes[studentNo] = noteText;
+    }
+
+    function batchSetAllStatus(status) {
+      const course = getCurrentCourse();
+      if (!course) return;
+      course.students.forEach(st => {
+        currentSession.records[st.studentNo] = status;
+      });
+      renderStudentRollCallList();
+      showToast('已將全班學生狀態設為：出席');
+    }
+
+    function batchResetAllStatus() {
+      const course = getCurrentCourse();
+      if (!course) return;
+      course.students.forEach(st => {
+        currentSession.records[st.studentNo] = 'present';
+        currentSession.notes[st.studentNo] = '';
+      });
+      renderStudentRollCallList();
+      showToast('已重設所有狀態為預設值');
+    }
+
+    function markAllUncheckedAsAbsent() {
+      const course = getCurrentCourse();
+      if (!course) return;
+      course.students.forEach(st => {
+        if (!currentSession.records[st.studentNo]) {
+          currentSession.records[st.studentNo] = 'absent';
+        }
+      });
+      renderStudentRollCallList();
+      showToast(`已將未明確標記之學生設為缺席`);
+    }
+
+    function updateStatusSummaryChips() {
+      const counts = { present: 0, late: 0, absent: 0, early: 0, leave: 0 };
+      const course = getCurrentCourse();
+      if (!course) return;
+
+      course.students.forEach(st => {
+        const s = currentSession.records[st.studentNo] || 'present';
+        if (counts[s] !== undefined) counts[s]++;
+      });
+
+      document.getElementById('chipCountPresent').textContent = `出席: ${counts.present}`;
+      document.getElementById('chipCountLate').textContent = `遲到: ${counts.late}`;
+      document.getElementById('chipCountAbsent').textContent = `缺席: ${counts.absent}`;
+      document.getElementById('chipCountEarly').textContent = `早退: ${counts.early}`;
+      document.getElementById('chipCountLeave').textContent = `請假: ${counts.leave}`;
+    }
+
+    /**
+     * Finish Roll Call & Display Instant Summary Modal
+     */
+    function finishCurrentRollCallAndShowSummary() {
+      const course = getCurrentCourse();
+      if (!course || course.students.length === 0) {
+        showToast('目前班級無學生');
+        return;
+      }
+
+      onSessionParameterChanged();
+
+      const totalStudents = course.students.length;
+      const counts = { present: 0, late: 0, absent: 0, early: 0, leave: 0 };
+      const abnormals = [];
+
+      course.students.forEach(st => {
+        const status = currentSession.records[st.studentNo] || 'present';
+        counts[status]++;
+        if (status !== 'present') {
+          const statusMap = { late: '遲到', absent: '缺席', early: '早退', leave: '請假' };
+          abnormals.push({
+            studentNo: st.studentNo,
+            name: st.name,
+            statusText: statusMap[status],
+            status: status,
+            note: currentSession.notes[st.studentNo] || ''
+          });
+        }
+      });
+
+      const attendanceRate = totalStudents > 0 ? ((counts.present / totalStudents) * 100).toFixed(1) : 0;
+
+      const totalWeightedScore = (
+        counts.present * appData.gradeWeights.present +
+        counts.late * appData.gradeWeights.late +
+        counts.early * appData.gradeWeights.early +
+        counts.leave * appData.gradeWeights.leave +
+        counts.absent * appData.gradeWeights.absent
+      ) / totalStudents;
+
+      // Populate Summary Modal
+      document.getElementById('summaryCourseAndSession').textContent = `${course.name} (${course.code}) • ${currentSession.date} ${currentSession.session}`;
+      document.getElementById('summaryTimestamp').textContent = `結算紀錄時間：${new Date().toLocaleString()}`;
+      document.getElementById('summaryRate').textContent = `${attendanceRate}%`;
+      document.getElementById('summaryAvgScore').textContent = `${totalWeightedScore.toFixed(1)} 分`;
+
+      document.getElementById('summaryCountPresent').textContent = counts.present;
+      document.getElementById('summaryCountLate').textContent = counts.late;
+      document.getElementById('summaryCountAbsent').textContent = counts.absent;
+      document.getElementById('summaryCountEarly').textContent = counts.early;
+      document.getElementById('summaryCountLeave').textContent = counts.leave;
+
+      const abnormalListEl = document.getElementById('summaryAbnormalList');
+      if (abnormals.length === 0) {
+        abnormalListEl.innerHTML = `<span style="color:var(--success); font-weight:600;">🎉 太棒了！全班所有學生皆準時出席！</span>`;
+      } else {
+        abnormalListEl.innerHTML = abnormals.map(a => `
+          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e2e8f0;">
+            <span><strong>${a.name}</strong> (${a.studentNo})</span>
+            <span>
+              <span class="chip chip-${a.status}">${a.statusText}</span>
+              ${a.note ? `<span style="color:var(--gray-500); margin-left:6px;">(${a.note})</span>` : ''}
+            </span>
+          </div>
+        `).join('');
+      }
+
+      saveCurrentSessionToHistory(attendanceRate, totalWeightedScore.toFixed(1));
+      openModal('modalSummary');
+    }
+
+    function saveCurrentSessionToHistory(rate, avgScore) {
+      const course = getCurrentCourse();
+      const newHistoryItem = {
+        id: 'hist_' + Date.now(),
+        courseId: course.id,
+        courseName: course.name,
+        courseCode: course.code,
+        date: currentSession.date,
+        session: currentSession.session,
+        mode: currentSession.mode,
+        records: { ...currentSession.records },
+        notes: { ...currentSession.notes },
+        totalStudents: course.students.length,
+        presentCount: Object.values(currentSession.records).filter(s => s === 'present').length,
+        attendanceRate: rate,
+        avgScore: avgScore,
+        createdAt: new Date().toLocaleString()
+      };
+
+      appData.historySessions.unshift(newHistoryItem);
+      saveAppData();
+      renderHistoryTable();
+    }
+
+    function openSessionSaveModal() {
+      finishCurrentRollCallAndShowSummary();
+    }
+
+    /**
+     * TAB 2: Analytics & Grading View
+     */
+    function renderAnalyticsView() {
+      const course = getCurrentCourse();
+      if (!course) return;
+
+      const courseHistory = appData.historySessions.filter(h => h.courseId === course.id);
+      const totalStudents = course.students.length;
+
+      document.getElementById('metricTotalStudents').textContent = `${totalStudents} 人`;
+
+      let currentPresents = 0, currentAbsents = 0, currentLates = 0, currentEarlys = 0, currentLeaves = 0;
+      course.students.forEach(st => {
+        const stStatus = currentSession.records[st.studentNo] || 'present';
+        if (stStatus === 'present') currentPresents++;
+        if (stStatus === 'late') currentLates++;
+        if (stStatus === 'absent') currentAbsents++;
+        if (stStatus === 'early') currentEarlys++;
+        if (stStatus === 'leave') currentLeaves++;
+      });
+
+      const currentRate = totalStudents > 0 ? ((currentPresents / totalStudents) * 100).toFixed(1) : 0;
+      document.getElementById('metricSessionRate').textContent = `${currentRate}%`;
+      document.getElementById('metricSessionRatio').textContent = `${currentPresents} / ${totalStudents} 人到課`;
+
+      const abnormalTotal = currentAbsents + currentLates + currentEarlys + currentLeaves;
+      document.getElementById('metricAbnormalCount').textContent = abnormalTotal;
+      document.getElementById('metricAbnormalBreakdown').textContent = `缺席 ${currentAbsents} • 遲到 ${currentLates} • 早退 ${currentEarlys} • 請假 ${currentLeaves}`;
+
+      const tbody = document.getElementById('analyticsTableBody');
+      tbody.innerHTML = '';
+
+      let totalStudentGradeSum = 0;
+
+      course.students.forEach((st, idx) => {
+        let stats = { present: 0, late: 0, absent: 0, early: 0, leave: 0, total: 0 };
+
+        const curStatus = currentSession.records[st.studentNo] || 'present';
+        stats[curStatus]++;
+        stats.total++;
+
+        courseHistory.forEach(h => {
+          if (h.records && h.records[st.studentNo]) {
+            const hStatus = h.records[st.studentNo];
+            stats[hStatus]++;
+            stats.total++;
+          }
+        });
+
+        const studentScore = (
+          (stats.present * appData.gradeWeights.present) +
+          (stats.late * appData.gradeWeights.late) +
+          (stats.early * appData.gradeWeights.early) +
+          (stats.leave * appData.gradeWeights.leave) +
+          (stats.absent * appData.gradeWeights.absent)
+        ) / (stats.total || 1);
+
+        totalStudentGradeSum += studentScore;
+
+        const studentRate = ((stats.present / (stats.total || 1)) * 100).toFixed(0);
+
+        let badgeClass = 'grade-excellent';
+        let alertText = '正常';
+        if (studentScore < 60) {
+          badgeClass = 'grade-danger';
+          alertText = '🚨 出席不及格預警';
+        } else if (studentScore < 80) {
+          badgeClass = 'grade-warning';
+          alertText = '⚠️ 需多注意出席率';
+        } else if (studentScore >= 90) {
+          badgeClass = 'grade-excellent';
+          alertText = '🌟 表現優異';
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${st.studentNo}</strong></td>
+          <td>${st.name}</td>
+          <td>${stats.total}</td>
+          <td style="color:var(--success); font-weight:700;">${stats.present}</td>
+          <td style="color:var(--warning); font-weight:700;">${stats.late}</td>
+          <td style="color:var(--danger); font-weight:700;">${stats.absent}</td>
+          <td style="color:var(--orange); font-weight:700;">${stats.early}</td>
+          <td style="color:var(--info); font-weight:700;">${stats.leave}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span>${studentRate}%</span>
+              <div style="width:50px; height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden;">
+                <div style="height:100%; width:${studentRate}%; background:var(--primary);"></div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="grade-badge ${badgeClass}">${studentScore.toFixed(1)} 分</span>
+          </td>
+          <td>
+            <span style="font-size:0.775rem;">${alertText}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const classAvg = totalStudents > 0 ? (totalStudentGradeSum / totalStudents).toFixed(1) : 100;
+      document.getElementById('metricClassAvgGrade').textContent = `${classAvg} 分`;
+    }
+
+    function renderGradeWeightsInputs() {
+      document.getElementById('weightPresent').value = appData.gradeWeights.present;
+      document.getElementById('weightLate').value = appData.gradeWeights.late;
+      document.getElementById('weightEarly').value = appData.gradeWeights.early;
+      document.getElementById('weightLeave').value = appData.gradeWeights.leave;
+      document.getElementById('weightAbsent').value = appData.gradeWeights.absent;
+    }
+
+    function saveGradeWeights() {
+      appData.gradeWeights.present = parseFloat(document.getElementById('weightPresent').value) || 100;
+      appData.gradeWeights.late = parseFloat(document.getElementById('weightLate').value) || 70;
+      appData.gradeWeights.early = parseFloat(document.getElementById('weightEarly').value) || 70;
+      appData.gradeWeights.leave = parseFloat(document.getElementById('weightLeave').value) || 85;
+      appData.gradeWeights.absent = parseFloat(document.getElementById('weightAbsent').value) || 0;
+
+      saveAppData();
+      renderAnalyticsView();
+      showToast('✅ 計分標準權重已更新並重新計算學生成績！');
+    }
+
+    function exportAnalyticsCSV() {
+      const course = getCurrentCourse();
+      if (!course) return;
+
+      const courseHistory = appData.historySessions.filter(h => h.courseId === course.id);
+
+      let csv = '\uFEFF';
+      csv += '座號,學號,姓名,點名總場次,出席次數,遲到次數,缺席次數,早退次數,請假次數,出席率(%),平時出缺席成績\n';
+
+      course.students.forEach((st, idx) => {
+        let stats = { present: 0, late: 0, absent: 0, early: 0, leave: 0, total: 0 };
+        const curStatus = currentSession.records[st.studentNo] || 'present';
+        stats[curStatus]++;
+        stats.total++;
+
+        courseHistory.forEach(h => {
+          if (h.records && h.records[st.studentNo]) {
+            stats[h.records[st.studentNo]]++;
+            stats.total++;
+          }
+        });
+
+        const studentScore = (
+          (stats.present * appData.gradeWeights.present) +
+          (stats.late * appData.gradeWeights.late) +
+          (stats.early * appData.gradeWeights.early) +
+          (stats.leave * appData.gradeWeights.leave) +
+          (stats.absent * appData.gradeWeights.absent)
+        ) / (stats.total || 1);
+
+        const rate = ((stats.present / (stats.total || 1)) * 100).toFixed(1);
+
+        csv += `${idx + 1},"${st.studentNo}","${st.name}",${stats.total},${stats.present},${stats.late},${stats.absent},${stats.early},${stats.leave},${rate}%,${studentScore.toFixed(1)}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', `${course.name}_出缺席成績統計報表_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('📊 CSV 成績總表匯出成功！');
+    }
+
+    /**
+     * TAB 3: Classes & Students Management
+     */
+    function renderManageView() {
+      renderCourseCards();
+      renderStudentManageTable();
+    }
+
+    function renderCourseCards() {
+      const container = document.getElementById('courseListContainer');
+      container.innerHTML = '';
+      appData.courses.forEach(c => {
+        const isCurrent = c.id === appData.currentCourseId;
+        const div = document.createElement('div');
+        div.style.padding = '0.75rem 1rem';
+        div.style.borderRadius = 'var(--radius-sm)';
+        div.style.border = isCurrent ? '2px solid var(--primary)' : '1px solid var(--gray-200)';
+        div.style.background = isCurrent ? 'var(--primary-light)' : 'white';
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.cursor = 'pointer';
+
+        div.innerHTML = `
+          <div onclick="selectCourseFromManage('${c.id}')" style="flex:1;">
+            <div style="font-weight:700; color:var(--gray-900); font-size:0.95rem;">${c.name}</div>
+            <div style="font-size:0.775rem; color:var(--gray-500);">${c.code} • ${c.students.length} 名學生 ${isCurrent ? '• <strong style="color:var(--primary);">當前選中</strong>' : ''}</div>
+          </div>
+          <div style="display:flex; gap:0.25rem;">
+            <button class="btn btn-secondary btn-sm" onclick="openEditCourseModal('${c.id}')">編輯</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')" ${appData.courses.length <= 1 ? 'disabled' : ''}>刪除</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function selectCourseFromManage(courseId) {
+      appData.currentCourseId = courseId;
+      document.getElementById('currentCourseSelect').value = courseId;
+      onCourseChanged();
+      renderManageView();
+    }
+
+    function renderStudentManageTable() {
+      const course = getCurrentCourse();
+      const titleEl = document.getElementById('manageCourseTitle');
+      const tbody = document.getElementById('studentManageTableBody');
+      tbody.innerHTML = '';
+
+      if (!course) {
+        titleEl.textContent = '尚未選擇課程';
+        return;
+      }
+
+      titleEl.textContent = `${course.name} (${course.code})`;
+
+      if (course.students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500);">目前尚無學生，請點擊上方「新增學生」或「批次匯入」</td></tr>`;
+        return;
+      }
+
+      course.students.forEach((st, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${st.studentNo}</strong></td>
+          <td>${st.name}</td>
+          <td>${st.note || '-'}</td>
+          <td style="text-align:right;">
+            <button class="btn btn-secondary btn-sm" onclick="openEditStudentModal('${st.studentNo}')">編輯</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteStudent('${st.studentNo}')">刪除</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openAddCourseModal() {
+      document.getElementById('courseModalTitle').textContent = '新增課程';
+      document.getElementById('editCourseId').value = '';
+      document.getElementById('courseInputName').value = '';
+      document.getElementById('courseInputCode').value = '';
+      openModal('modalCourse');
+    }
+
+    function openEditCourseModal(courseId) {
+      const course = appData.courses.find(c => c.id === courseId);
+      if (!course) return;
+      document.getElementById('courseModalTitle').textContent = '編輯課程';
+      document.getElementById('editCourseId').value = course.id;
+      document.getElementById('courseInputName').value = course.name;
+      document.getElementById('courseInputCode').value = course.code;
+      openModal('modalCourse');
+    }
+
+    function submitCourseForm() {
+      const id = document.getElementById('editCourseId').value;
+      const name = document.getElementById('courseInputName').value.trim();
+      const code = document.getElementById('courseInputCode').value.trim();
+
+      if (!name) {
+        alert('請填寫課程名稱');
+        return;
+      }
+
+      if (id) {
+        const course = appData.courses.find(c => c.id === id);
+        if (course) {
+          course.name = name;
+          course.code = code;
+        }
+      } else {
+        const newCourse = {
+          id: 'c_' + Date.now(),
+          name: name,
+          code: code || '一般班級',
+          students: []
+        };
+        appData.courses.push(newCourse);
+        appData.currentCourseId = newCourse.id;
+      }
+
+      saveAppData();
+      renderCourseOptions();
+      onCourseChanged();
+      renderManageView();
+      closeModal('modalCourse');
+      showToast('✅ 課程已成功儲存！');
+    }
+
+    function deleteCourse(courseId) {
+      if (appData.courses.length <= 1) {
+        alert('系統中至少需保留一門課程');
+        return;
+      }
+      if (confirm('確定要刪除此課程與其名單嗎？此操作無法復原。')) {
+        appData.courses = appData.courses.filter(c => c.id !== courseId);
+        appData.currentCourseId = appData.courses[0].id;
+        saveAppData();
+        renderCourseOptions();
+        onCourseChanged();
+        renderManageView();
+        showToast('已刪除該課程');
+      }
+    }
+
+    function openAddStudentModal() {
+      document.getElementById('studentModalTitle').textContent = '新增學生';
+      document.getElementById('editStudentOriginalNo').value = '';
+      document.getElementById('studentInputNo').value = '';
+      document.getElementById('studentInputName').value = '';
+      document.getElementById('studentInputNote').value = '';
+      openModal('modalStudent');
+    }
+
+    function openEditStudentModal(studentNo) {
+      const course = getCurrentCourse();
+      const student = course.students.find(s => s.studentNo === studentNo);
+      if (!student) return;
+
+      document.getElementById('studentModalTitle').textContent = '編輯學生資料';
+      document.getElementById('editStudentOriginalNo').value = student.studentNo;
+      document.getElementById('studentInputNo').value = student.studentNo;
+      document.getElementById('studentInputName').value = student.name;
+      document.getElementById('studentInputNote').value = student.note || '';
+      openModal('modalStudent');
+    }
+
+    function submitStudentForm() {
+      const origNo = document.getElementById('editStudentOriginalNo').value;
+      const no = document.getElementById('studentInputNo').value.trim();
+      const name = document.getElementById('studentInputName').value.trim();
+      const note = document.getElementById('studentInputNote').value.trim();
+      const course = getCurrentCourse();
+
+      if (!no || !name) {
+        alert('請填寫學號與姓名');
+        return;
+      }
+
+      if (origNo) {
+        const student = course.students.find(s => s.studentNo === origNo);
+        if (student) {
+          student.studentNo = no;
+          student.name = name;
+          student.note = note;
+        }
+      } else {
+        if (course.students.some(s => s.studentNo === no)) {
+          alert('該學號已存在於此班級');
+          return;
+        }
+        course.students.push({ studentNo: no, name: name, note: note });
+      }
+
+      saveAppData();
+      renderCourseOptions();
+      onCourseChanged();
+      renderManageView();
+      closeModal('modalStudent');
+      showToast('✅ 學生資料已儲存！');
+    }
+
+    function deleteStudent(studentNo) {
+      if (confirm(`確定要刪除學號 ${studentNo} 嗎？`)) {
+        const course = getCurrentCourse();
+        course.students = course.students.filter(s => s.studentNo !== studentNo);
+        saveAppData();
+        renderCourseOptions();
+        onCourseChanged();
+        renderManageView();
+        showToast('已刪除該名學生');
+      }
+    }
+
+    function openBatchImportModal() {
+      document.getElementById('batchImportText').value = '';
+      openModal('modalBatchImport');
+    }
+
+    function executeBatchImport() {
+      const text = document.getElementById('batchImportText').value.trim();
+      if (!text) {
+        alert('請輸入名單內容');
+        return;
+      }
+
+      const lines = text.split('\n');
+      const course = getCurrentCourse();
+      let importedCount = 0;
+
+      lines.forEach((line, idx) => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+
+        const parts = trimmed.split(/[\s,]+/);
+        let studentNo = '';
+        let studentName = '';
+        let note = '';
+
+        if (parts.length >= 2) {
+          studentNo = parts[0];
+          studentName = parts[1];
+          note = parts.slice(2).join(' ');
+        } else {
+          studentName = parts[0];
+          studentNo = `S${String(course.students.length + 1).padStart(3, '0')}`;
+        }
+
+        const existing = course.students.find(s => s.studentNo === studentNo);
+        if (existing) {
+          existing.name = studentName;
+          if (note) existing.note = note;
+        } else {
+          course.students.push({
+            studentNo: studentNo,
+            name: studentName,
+            note: note
+          });
+          importedCount++;
+        }
+      });
+
+      saveAppData();
+      renderCourseOptions();
+      onCourseChanged();
+      renderManageView();
+      closeModal('modalBatchImport');
+      showToast(`🎉 成功匯入 ${importedCount} 位新學生！`);
+    }
+
+    /**
+     * TAB 4: History Table
+     */
+    function renderHistoryTable() {
+      const tbody = document.getElementById('historyTableBody');
+      tbody.innerHTML = '';
+
+      if (appData.historySessions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--gray-500); padding:2rem;">目前尚無歷史點名紀錄</td></tr>`;
+        return;
+      }
+
+      appData.historySessions.forEach((h, idx) => {
+        const modeLabels = {
+          manual: '👆 手動點名',
+          qrcode: '📱 QR Code',
+          gps: '📍 GPS 定位',
+          random: '🎲 隨機抽點'
+        };
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${h.date}</strong></td>
+          <td>${h.courseName} <span style="font-size:0.75rem; color:var(--gray-500);">(${h.courseCode})</span></td>
+          <td>${h.session}</td>
+          <td><span style="font-size:0.8rem; background:var(--gray-100); padding:2px 8px; border-radius:6px;">${modeLabels[h.mode] || '點名'}</span></td>
+          <td>${h.totalStudents} 人</td>
+          <td style="color:var(--success); font-weight:700;">${h.presentCount} 人</td>
+          <td><strong>${h.attendanceRate}%</strong></td>
+          <td style="font-size:0.775rem; color:var(--gray-500);">${h.createdAt}</td>
+          <td style="text-align:right;">
+            <button class="btn btn-secondary btn-sm" onclick="loadHistoryToActiveSession('${h.id}')">載入查看</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteHistorySession('${h.id}')">刪除</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadHistoryToActiveSession(historyId) {
+      const hist = appData.historySessions.find(h => h.id === historyId);
+      if (!hist) return;
+
+      appData.currentCourseId = hist.courseId;
+      document.getElementById('currentCourseSelect').value = hist.courseId;
+      document.getElementById('rollCallDate').value = hist.date;
+      document.getElementById('rollCallSession').value = hist.session;
+
+      currentSession.courseId = hist.courseId;
+      currentSession.date = hist.date;
+      currentSession.session = hist.session;
+      currentSession.mode = hist.mode || 'manual';
+      currentSession.records = { ...hist.records };
+      currentSession.notes = { ...(hist.notes || {}) };
+
+      renderStudentRollCallList();
+      switchTab('rollcall');
+      switchRollCallMode(hist.mode || 'manual');
+      showToast(`已載入 ${hist.date} ${hist.session} 之點名紀錄`);
+    }
+
+    function deleteHistorySession(historyId) {
+      if (confirm('確定要刪除這筆歷史點名紀錄嗎？')) {
+        appData.historySessions = appData.historySessions.filter(h => h.id !== historyId);
+        saveAppData();
+        renderHistoryTable();
+        showToast('已刪除該紀錄');
+      }
+    }
+
+    function clearAllHistoryData() {
+      if (confirm('確定要清空所有歷史點名紀錄嗎？此動作無法復原。')) {
+        appData.historySessions = [];
+        saveAppData();
+        renderHistoryTable();
+        showToast('已清空所有歷史紀錄');
+      }
+    }
+
+    /**
+     * Modal Helpers
+     */
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.remove('active');
+    }
+
+    /**
+     * Toast Notifications
+     */
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
